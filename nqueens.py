@@ -60,7 +60,7 @@ class Board:
 
 class Solver_8_queens:
 
-    def __init__(self, pop_size=1000, cross_prob=0.11, mut_prob=0.05):
+    def __init__(self, pop_size=1000, cross_prob=0.24, mut_prob=0.15):
         self.board_size = 8
         self.fitness = 1
         self.population_size = pop_size
@@ -80,7 +80,7 @@ class Solver_8_queens:
     def __random_selection(self):
         population_list = [(i, item.fitness) for i, item in enumerate(self.population)]
         population_list.sort(key=lambda item: item[1], reverse=True)
-        return population_list[:int(len(population_list) / self.cross_prob)]
+        return population_list[:int(len(population_list) / 3)]
 
     def __first_generation(self):
         for i in range(self.population_size):
@@ -94,7 +94,7 @@ class Solver_8_queens:
         new_population = []
 
         while len(new_population) < self.population_size:
-            sel = random.choice(selections)[0] if random.random() < self.cross_prob \
+            sel = random.choice(selections)[0] if random.uniform(0, 1) < self.cross_prob \
                 else random.randint(0, self.population_size - 1)
             new_population.append(copy.deepcopy(self.population[sel]))
         self.population = new_population
