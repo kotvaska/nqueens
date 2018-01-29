@@ -8,9 +8,8 @@ debug = False
 
 
 class Board:
-    def __init__(self, fitness, board_size=8, mut_prob=1.0):
+    def __init__(self, board_size=8, mut_prob=1.0):
         self.board_size = board_size
-        self.desired_fitness = fitness
         self.mut_prob = mut_prob
 
         self.fitness = 0
@@ -34,15 +33,13 @@ class Board:
 
     def compute_fitness(self):
         conflicts = 0
-        self.fitness = self.desired_fitness
 
         for i in range(self.board_size):
             for j in range(i + 1, self.board_size):
                 if math.fabs(int(self.queens[i], 2) - int(self.queens[j], 2)) == j - i:
                     conflicts += 1
 
-        if conflicts > 0:
-            self.fitness = 1 - (conflicts / (len(self.queens) * 8))
+        self.fitness = 1 - (conflicts / (len(self.queens) * 8))
 
     def visualization(self):
         board = ""
@@ -84,7 +81,7 @@ class Solver_8_queens:
 
     def __first_generation(self):
         for i in range(self.population_size):
-            self.population.append(Board(self.fitness, self.board_size, self.mut_prob))
+            self.population.append(Board(self.board_size, self.mut_prob))
 
         self.__print_population()
 
@@ -120,7 +117,7 @@ class Solver_8_queens:
             print("%8d : (%d) %s" % (count, population.fitness, str(population.queens)))
             count += 1
 
-    def solve(self, min_fitness=0.9, max_epochs=100):
+    def solve(self, min_fitness=1.0, max_epochs=100):
         best_fit = None
         epoch_num = None
         visualization = None
