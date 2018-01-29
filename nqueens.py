@@ -42,7 +42,7 @@ class Board:
                     conflicts += 1
 
         if conflicts > 0:
-            self.fitness = 1 - (conflicts * 100 / (len(self.queens) * 8))
+            self.fitness = 1 - (conflicts / (len(self.queens) * 8))
 
     def visualization(self):
         board = ""
@@ -60,7 +60,7 @@ class Board:
 
 class Solver_8_queens:
 
-    def __init__(self, pop_size=1000, cross_prob=0.24, mut_prob=0.15):
+    def __init__(self, pop_size=1000, cross_prob=0.85, mut_prob=0.05):
         self.board_size = 8
         self.fitness = 1
         self.population_size = pop_size
@@ -73,7 +73,7 @@ class Solver_8_queens:
 
     def __found_match(self):
         for population in self.population:
-            if population.fitness == self.fitness:
+            if population.fitness >= self.fitness:
                 return True
         return False
 
@@ -143,10 +143,10 @@ class Solver_8_queens:
         if -1 < self.generation_size <= self.__generation_count:
             print("Couldn't find result in %d generations" % self.__generation_count)
         elif self.__found_match():
-            for population in self.population:
-                if population.fitness == self.fitness:
-                    best_fit = population.fitness
-                    epoch_num = self.__generation_count
-                    visualization = population.visualization()
+            self.population.sort(key=lambda item: item.fitness, reverse=True)
+            if self.population[0].fitness >= self.fitness:
+                best_fit = self.population[0].fitness
+                epoch_num = self.__generation_count
+                visualization = self.population[0].visualization()
 
         return best_fit, epoch_num, visualization
