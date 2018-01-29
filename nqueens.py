@@ -14,9 +14,9 @@ class Board:
         self.fitness = 0
 
         self.queens = list(range(self.board_size))
-        self.move(self.board_size / 2)
+        self.move_gen(self.board_size / 2)
 
-    def move(self, count):
+    def move_gen(self, count):
         count = int(count)
 
         for i in range(count):
@@ -26,11 +26,11 @@ class Board:
 
         self.compute_fitness()
 
-    def regenerate(self):
-        self.move(2)
+    def mutate(self):
+        self.move_gen(2)
 
         if random.uniform(0, 1) < self.mut_prob:
-            self.move(1)
+            self.move_gen(1)
 
     def compute_fitness(self):
         self.fitness = self.desired_fitness
@@ -58,32 +58,37 @@ class Solver_8_queens:
 
     def __init__(self, pop_size=1000, cross_prob=0.11, mut_prob=0.05):
         self.board_size = 8
+        self.fitness = int((self.board_size * self.board_size) / 2)
         self.population_size = pop_size
+        self.generation_size = -1
         self.cross_prob = cross_prob
         self.mut_prob = mut_prob
 
-    def found_match(self):
+        self.population = []
+        self.generation_count = 0
+
+    def __found_match(self):
         for population in self.population:
             if population.fitness == self.fitness:
                 return True
         return False
 
-    def random_selection(self):
+    def __random_selection(self):
         population_list = []
         for i in range(len(self.population)):
             population_list.append((i, self.population[i].fitness))
         population_list.sort(key=lambda pop_item: pop_item[1], reverse=True)
-        return population_list[:int(len(population_list) / 3)]
+        return population_list[:int(len(population_list) / self.cross_prob)]
 
-    def first_generation(self):
+    def __first_generation(self):
         for i in range(self.population_size):
             self.population.append(Board(self.fitness, self.board_size, self.mut_prob))
 
-        self.print_population()
+        self.__print_population()
 
-    def next_generation(self):
+    def __next_generation(self):
         self.generation_count += 1
-        selections = self.random_selection()
+        selections = self.__random_selection()
         new_population = []
 
         while len(new_population) < self.population_size:
@@ -92,14 +97,14 @@ class Solver_8_queens:
         self.population = new_population
 
         for population in self.population:
-            population.regenerate()
+            population.mutate()
 
-        self.print_population(selections)
+        self.__print_population(selections)
 
-    def print_population(self, selections=None):
+    def __print_population(self, selections=None):
         print("Population #%d" % self.generation_count)
 
-        if selections == None:
+        if selections is None:
             selections = []
 
         print("Using: %s" % str([sel[0] for sel in selections]))
@@ -114,24 +119,24 @@ class Solver_8_queens:
         epoch_num = None
         visualization = None
 
-        self.generation_size = max_epochs
-        self.fitness = min_fitness
+        self.generation_size = self.generation_size if max_epochs is None else max_epochs
+        self.fitness = self.fitness if min_fitness is None else min_fitness
         self.population = []
         self.generation_count = 0
 
-        self.first_generation()
+        self.__first_generation()
 
         while True:
-            if self.found_match() == True:
+            if self.__found_match() is True:
                 break
             if -1 < self.generation_size <= self.generation_count:
                 break
 
-            self.next_generation()
+            self.__next_generation()
 
-        if self.generation_size <= self.generation_count:
+        if -1 < self.generation_size <= self.generation_count:
             print("Couldn't find result in %d generations" % self.generation_count)
-        elif self.found_match():
+        elif self.__found_match():
             for population in self.population:
                 if population.fitness == self.fitness:
                     best_fit = population.fitness
