@@ -33,12 +33,16 @@ class Board:
             self.move_gen(1)
 
     def compute_fitness(self):
+        conflicts = 0
         self.fitness = self.desired_fitness
 
         for i in range(self.board_size):
             for j in range(i + 1, self.board_size):
                 if math.fabs(int(self.queens[i], 2) - int(self.queens[j], 2)) == j - i:
-                    self.fitness -= 1
+                    conflicts += 1
+
+        if conflicts > 0:
+            self.fitness = 1 - (conflicts * 100 / (len(self.queens) * 8))
 
     def visualization(self):
         board = ""
@@ -58,7 +62,7 @@ class Solver_8_queens:
 
     def __init__(self, pop_size=1000, cross_prob=0.11, mut_prob=0.05):
         self.board_size = 8
-        self.fitness = int((self.board_size * self.board_size) / 2)
+        self.fitness = 1
         self.population_size = pop_size
         self.generation_size = -1
         self.cross_prob = cross_prob
