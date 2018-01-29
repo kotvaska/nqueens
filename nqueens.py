@@ -137,13 +137,10 @@ class Solver_8_queens:
 
             self.__next_generation()
 
-        if -1 < self.generation_size <= self.__generation_count:
-            print("Couldn't find result in %d generations" % self.__generation_count)
-        elif self.__found_match():
-            self.population.sort(key=lambda item: item.fitness, reverse=True)
-            if self.population[0].fitness >= self.fitness:
-                best_fit = self.population[0].fitness
-                epoch_num = self.__generation_count
-                visualization = self.population[0].visualization()
+        self.population.sort(key=lambda item: item.fitness, reverse=True)
+        if self.population[0].fitness >= self.fitness:
+            best_fit = self.population[0].fitness
+            epoch_num = self.__generation_count
+            visualization = self.population[0].visualization()
 
         return best_fit, epoch_num, visualization
